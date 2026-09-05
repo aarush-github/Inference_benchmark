@@ -1,7 +1,6 @@
 venv/
 data/*.csv
-.env
-venv/
 __pycache__/
-data/*.csv
+**/.env
 .env
+.env.*data/sharegpt/raw/

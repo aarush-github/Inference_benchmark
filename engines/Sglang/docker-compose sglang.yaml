@@ -1,0 +1,45 @@
+name: SGLang_Inference
+
+networks:
+  server:
+    driver: bridge
+
+services:
+  sglang:
+    image: lmsysorg/sglang:latest
+    container_name: SGLang_Baseline
+    privileged: true
+    env_file:
+      - ../../.env
+    networks:
+      - server
+    ports:
+      - "8000:8000" 
+    ipc: host
+    ulimits:
+      memlock: -1
+      stack: 67108864
+      nofile:
+        soft: 1048576
+        hard: 1048576
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    environment:
+      - HF_TOKEN=${HF_TOKEN}
+      - HF_HOME=/data/hf
+      - HF_HUB_CACHE=/data/hf/hub
+    volumes:
+      - ${HOME}/.cache/huggingface:/data/hf
+      - /dev/null:/etc/ld.so.conf.d/00-cuda-compat.conf
+    command:
+      - python3
+      - -m
+      - sglang.launch_server
+      - --model-path=meta-llama/Meta-Llama-3-8B-Instruct
+      - --host=0.0.0.0
+      - --port=8000

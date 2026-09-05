@@ -1,0 +1,48 @@
+name: TRTLLM_Inference
+
+networks:
+  server:
+    driver: bridge
+
+services:
+  trtllm:
+    image: nvcr.io/nvidia/trtllm-base:v1.3.0rc24
+    container_name: TRTLLM_Baseline
+    privileged: true
+    env_file:
+      - /home/dell/inference-bakeoff/.env
+    networks:
+      - server
+    ports:
+      - "8000:8000" 
+    ipc: host
+    ulimits:
+      memlock: -1
+      stack: 67108864
+      nofile:
+        soft: 1048576
+        hard: 1048576
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    environment:
+      - HF_TOKEN=${HF_TOKEN}
+      - HF_HOME=/data/hf
+      - HF_HUB_CACHE=/data/hf/hub
+    volumes:
+      # Maps your local Hugging Face cache
+      - ${HOME}/.cache/huggingface:/data/hf
+      # Maps your pre-compiled TRT engine folder to the container
+      - ../../data/trt_engine:/workspace/engine_outputs
+      - /dev/null:/etc/ld.so.conf.d/00-cuda-compat.conf
+    command:
+      - python3
+      - -m
+      - trtllm.api_server.openai_server
+      - --model_dir=/workspace/engine_outputs
+      - --host=0.0.0.0
+      - --port=8000
