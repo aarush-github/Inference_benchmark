@@ -145,14 +145,27 @@ def main():
 
     # Load dataset if provided, else fallback to dummies
     if args.dataset and os.path.exists(args.dataset):
-        with open(args.dataset, 'r') as f:
-            prompts = json.load(f)
-            # Truncate or expand to match --requests limit if desired, or just use all
-            prompts = prompts[:args.requests] if len(prompts) > args.requests else prompts
+        prompts = []
+        with open(args.dataset, "r", encoding="utf-8") as f:
+            if args.dataset.endswith(".jsonl"):
+                for line in f:
+                    line = line.strip()
+                    if not line:
+                        continue
+                    item = json.loads(line)
+                    # Extract string if saved as {"id": ..., "prompt": ...}, else use directly
+                    prompt_text = item.get("prompt") if isinstance(item, dict) else str(item)
+                    prompts.append(prompt_text)
+            else:
+                raw_data = json.load(f)
+                for item in raw_data:
+                    prompt_text = item.get("prompt") if isinstance(item, dict) else str(item)
+                    prompts.append(prompt_text)
+
+        prompts = prompts[:args.requests]
     else:
         print("Warning: No dataset provided. Falling back to dummy prompts.")
         prompts = [f"Explain the theory of relativity. Request ID: {i}" for i in range(args.requests)]
-
     tester = AsyncLoadTester(
         endpoint=args.endpoint,
         model_name=args.model,
