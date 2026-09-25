@@ -1,0 +1,10 @@
+{
+  "total_requests": 100,
+  "successful_requests": 100,
+  "failed_requests": 0,
+  "throughput_tps": 144.08,
+  "ttft_p50": 74.0366,
+  "ttft_p95": 160.6992,
+  "latency_p50": 91.039,
+  "latency_p95": 177.1557
+}
