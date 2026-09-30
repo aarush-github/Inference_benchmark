@@ -1,0 +1,16 @@
+{
+  "type": "json_schema",
+  "json_schema": {
+    "name": "user_profile",
+    "strict": true,
+    "schema": {
+      "type": "object",
+      "properties": {
+        "summary": {"type": "string"},
+        "sentiment_score": {"type": "integer"}
+      },
+      "required": ["summary", "sentiment_score"],
+      "additionalProperties": false
+    }
+  }
+}
