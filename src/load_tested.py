@@ -61,20 +61,24 @@ async def sample_gpu_memory(gpu_index, interval, stop_event, samples, utilizatio
             pass
 
 
-async def send_stream_request(session, endpoint, model, prompt, error_counter,
+async def send_stream_request(session, endpoint, model, prompt, error_counter, system_prompt=None, response_format=None,
                                max_tokens=256, ignore_eos=False, req_timeout=180):
+    messages = []
+    if system_prompt:
+        messages.append({"role": "system", "content": system_prompt})
+    messages.append({"role": "user", "content": prompt})
+
     payload = {
         "model": model,
-        "messages": [{"role": "user", "content": prompt}],
+        "messages": messages,
         "max_tokens": max_tokens,
         "stream": True,
         "stream_options": {"include_usage": True},
     }
     if ignore_eos:
-        # Forces generation to run the full max_tokens length instead of stopping
-        # early, so TPS/TPOT comparisons across engines aren't confounded by how
-        # early each model chose to stop. Supported by vLLM and SGLang.
         payload["ignore_eos"] = True
+    if response_format:
+        payload["response_format"] = response_format
 
     start_time = time.time()
     first_token_time = None
@@ -181,7 +185,7 @@ def load_prompts_jsonl(path, total_required):
 
 
 async def benchmark(endpoint, model, dataset_path, concurrency, num_requests, warmup, tag,
-                     max_tokens, ignore_eos, gpu_index):
+                     max_tokens, ignore_eos, gpu_index, system_prompt=None, response_format=None):
     total_required = warmup + num_requests
     all_lines = load_prompts_jsonl(dataset_path, total_required)
 
@@ -198,6 +202,7 @@ async def benchmark(endpoint, model, dataset_path, concurrency, num_requests, wa
             async with semaphore:
                 return await send_stream_request(
                     session, endpoint, model, prompt, error_counter,
+                    system_prompt=system_prompt, response_format=response_format,
                     max_tokens=max_tokens, ignore_eos=ignore_eos,
                 )
 
@@ -348,12 +353,18 @@ if __name__ == "__main__":
     parser.add_argument("--gpu-index", type=int, default=0)
     parser.add_argument("--tag", type=str, default="", help="Run identifier, e.g. vllm_fp8_kvcache")
     parser.add_argument("--output", type=str, required=True)
+    parser.add_argument("--system-prompt-file", type=str, default=None,
+                     help="Fixed text sent as a system-role message on every request")
+    parser.add_argument("--response-format-file", type=str, default=None,
+                     help="JSON file containing an OpenAI-style response_format object")
     args = parser.parse_args()
-
+    system_prompt = open(args.system_prompt_file).read().strip() if args.system_prompt_file else None
+    response_format = json.load(open(args.response_format_file)) if args.response_format_file else None
     final_metrics = asyncio.run(
         benchmark(args.endpoint, args.model, args.dataset, args.concurrency,
                   args.requests, args.warmup, args.tag,
-                  args.max_tokens, args.ignore_eos, args.gpu_index)
+                  args.max_tokens, args.ignore_eos, args.gpu_index,
+                  system_prompt=system_prompt, response_format=response_format)
     )
 
     with open(args.output, "w") as f:
