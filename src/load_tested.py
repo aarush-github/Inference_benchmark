@@ -191,8 +191,7 @@ async def benchmark(endpoint, model, dataset_path, concurrency, num_requests, wa
     duration_mode = duration is not None
 
     if duration_mode:
-        with open(dataset_path, "r", encoding="utf-8") as f:
-            all_lines = [json.loads(line)["text"] for line in f]
+        all_lines = load_prompts_jsonl(dataset_path, warmup)   # minimal check — we want the whole file, not a fixed count
         warmup_prompts = all_lines[:warmup]
         prompts = all_lines[warmup:]
     else:
