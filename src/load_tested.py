@@ -185,12 +185,21 @@ def load_prompts_jsonl(path, total_required):
 
 
 async def benchmark(endpoint, model, dataset_path, concurrency, num_requests, warmup, tag,
-                     max_tokens, ignore_eos, gpu_index, system_prompt=None, response_format=None):
-    total_required = warmup + num_requests
-    all_lines = load_prompts_jsonl(dataset_path, total_required)
+                    max_tokens, ignore_eos, gpu_index, system_prompt=None, response_format=None, duration=None):
+    
+    # Bug 1 Fix: Explicit boolean flag for mode selection
+    duration_mode = duration is not None
 
-    warmup_prompts = all_lines[:warmup]
-    prompts = all_lines[warmup:warmup + num_requests]
+    if duration_mode:
+        with open(dataset_path, "r", encoding="utf-8") as f:
+            all_lines = [json.loads(line)["text"] for line in f]
+        warmup_prompts = all_lines[:warmup]
+        prompts = all_lines[warmup:]
+    else:
+        total_required = warmup + num_requests
+        all_lines = load_prompts_jsonl(dataset_path, total_required)
+        warmup_prompts = all_lines[:warmup]
+        prompts = all_lines[warmup:warmup + num_requests]
 
     error_counter = Counter()
     nvml_initialized = init_nvml()
@@ -211,8 +220,6 @@ async def benchmark(endpoint, model, dataset_path, concurrency, num_requests, wa
             await asyncio.gather(*[bounded_request(p) for p in warmup_prompts])
             error_counter.clear()
 
-        # Capture idle VRAM before launching concurrent load, so vram_delta_mb
-        # reflects what the benchmark itself added, not what the server already held.
         base_vram = await get_current_vram(gpu_index) if nvml_initialized else None
 
         vram_samples = []
@@ -224,10 +231,34 @@ async def benchmark(endpoint, model, dataset_path, concurrency, num_requests, wa
                 sample_gpu_memory(gpu_index, 0.5, stop_event, vram_samples, gpu_util_samples)
             )
 
-        print(f"Benchmarking {len(prompts)} requests (concurrency={concurrency})...")
-        tasks = [bounded_request(p) for p in prompts]
+        results_list = []
+        dispatched_count = 0  # Bug 2 Fix: Track real dispatch count
         start_benchmark = time.time()
-        responses = await asyncio.gather(*tasks)
+
+        if duration_mode:
+            print(f"Benchmarking for {duration}s measurement window (concurrency={concurrency})...")
+            deadline = start_benchmark + duration
+
+            async def worker():
+                nonlocal dispatched_count
+                i = 0
+                n = len(prompts)
+                while time.time() < deadline:
+                    p = prompts[i % n]
+                    i += 1
+                    dispatched_count += 1
+                    r = await bounded_request(p)
+                    if r is not None:
+                        results_list.append(r)
+
+            await asyncio.gather(*[worker() for _ in range(concurrency)])
+        else:
+            print(f"Benchmarking {len(prompts)} requests (concurrency={concurrency})...")
+            dispatched_count = len(prompts)
+            tasks = [bounded_request(p) for p in prompts]
+            responses = await asyncio.gather(*tasks)
+            results_list = [r for r in responses if r is not None]
+
         end_benchmark = time.time()
 
         if nvml_initialized and sampler_task:
@@ -238,15 +269,15 @@ async def benchmark(endpoint, model, dataset_path, concurrency, num_requests, wa
             except pynvml.NVMLError:
                 pass
 
-    results = [r for r in responses if r is not None]
-    duration = end_benchmark - start_benchmark
+    results = results_list
+    elapsed_seconds = end_benchmark - start_benchmark  # Bug 1 Fix: Explicit duration variable name
 
     peak_vram = max(vram_samples) if vram_samples else None
     avg_vram = round(float(np.mean(vram_samples)), 1) if vram_samples else None
     average_gpu_util = round(float(np.mean(gpu_util_samples)), 1) if gpu_util_samples else None
     maximum_gpu_util = max(gpu_util_samples) if gpu_util_samples else None
     vram_delta = (peak_vram - base_vram) if (peak_vram is not None and base_vram is not None) else None
-
+    
     if not results:
         # Same schema as a successful run (all keys present, stats just null) so
         # downstream Week-6 aggregation never has to special-case a failed run.
@@ -256,9 +287,9 @@ async def benchmark(endpoint, model, dataset_path, concurrency, num_requests, wa
             "endpoint": endpoint,
             "model": model,
             "concurrency": concurrency,
-            "total_requests": len(prompts),
+            "total_requests": dispatched_count,
             "successful_requests": 0,
-            "duration_seconds": round(duration, 2),
+            "duration_seconds": round(elapsed_seconds, 2),
             "throughput_req_per_sec": None,
             "output_tokens_per_sec": None,
             "input_tokens_per_sec": None,
@@ -302,12 +333,12 @@ async def benchmark(endpoint, model, dataset_path, concurrency, num_requests, wa
         "endpoint": endpoint,
         "model": model,
         "concurrency": concurrency,
-        "total_requests": len(prompts),
+        "total_requests": dispatched_count,
         "successful_requests": len(results),
-        "duration_seconds": round(duration, 2),
-        "throughput_req_per_sec": round(len(results) / duration, 2),
-        "output_tokens_per_sec": round(total_output_tokens / duration, 2),
-        "input_tokens_per_sec": round(total_input_tokens / duration, 2) if total_input_tokens else None,
+        "duration_seconds": round(elapsed_seconds, 2),
+        "throughput_req_per_sec": round(len(results) / elapsed_seconds, 2),
+        "output_tokens_per_sec": round(total_output_tokens / elapsed_seconds, 2),
+        "input_tokens_per_sec": round(total_input_tokens / elapsed_seconds, 2) if total_input_tokens else None,
         "prompt_tokens_mean": round(float(np.mean(input_tokens_known)), 1) if input_tokens_known else None,
         "prompt_tokens_p50": int(np.percentile(input_tokens_known, 50)) if input_tokens_known else None,
         "prompt_tokens_p95": int(np.percentile(input_tokens_known, 95)) if input_tokens_known else None,
@@ -357,6 +388,8 @@ if __name__ == "__main__":
                      help="Fixed text sent as a system-role message on every request")
     parser.add_argument("--response-format-file", type=str, default=None,
                      help="JSON file containing an OpenAI-style response_format object")
+    parser.add_argument("--duration", type=int, default=None,
+                     help="Run for N seconds instead of a fixed request count (for concurrency sweeps)")
     args = parser.parse_args()
     system_prompt = open(args.system_prompt_file).read().strip() if args.system_prompt_file else None
     response_format = json.load(open(args.response_format_file)) if args.response_format_file else None
@@ -364,7 +397,8 @@ if __name__ == "__main__":
         benchmark(args.endpoint, args.model, args.dataset, args.concurrency,
                   args.requests, args.warmup, args.tag,
                   args.max_tokens, args.ignore_eos, args.gpu_index,
-                  system_prompt=system_prompt, response_format=response_format)
+                  system_prompt=system_prompt, response_format=response_format, duration=args.duration
+                  )
     )
 
     with open(args.output, "w") as f:
