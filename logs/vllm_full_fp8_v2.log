@@ -1,0 +1,159 @@
+(APIServer pid=21537) INFO 10-10 11:00:35 [api_utils.py:347] 
+(APIServer pid=21537) INFO 10-10 11:00:35 [api_utils.py:347]        █     █     █▄   ▄█
+(APIServer pid=21537) INFO 10-10 11:00:35 [api_utils.py:347]  ▄▄ ▄█ █     █     █ ▀▄▀ █  version 0.30.0
+(APIServer pid=21537) INFO 10-10 11:00:35 [api_utils.py:347]   █▄█▀ █     █     █     █  model   Qwen/Qwen3-8B-FP8
+(APIServer pid=21537) INFO 10-10 11:00:35 [api_utils.py:347]    ▀▀  ▀▀▀▀▀ ▀▀▀▀▀ ▀     ▀
+(APIServer pid=21537) INFO 10-10 11:00:35 [api_utils.py:347] 
+(APIServer pid=21537) INFO 10-10 11:00:35 [api_utils.py:286] non-default args: {'model_tag': 'Qwen/Qwen3-8B-FP8', 'model': 'Qwen/Qwen3-8B-FP8', 'trust_remote_code': True, 'max_model_len': 8192, 'served_model_name': ['Qwen/Qwen3-8B-FP8'], 'gpu_memory_utilization': 0.85, 'max_num_seqs': 256}
+(APIServer pid=21537) Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+(APIServer pid=21537) INFO 10-10 11:00:35 [model.py:692] Resolved architecture: Qwen3ForCausalLM
+(APIServer pid=21537) INFO 10-10 11:00:35 [model.py:2030] Using max model len 8192
+(APIServer pid=21537) INFO 10-10 11:00:36 [kernel.py:416] Final IR op priority after setting platform defaults: IrOpPriorityConfig(rms_norm=['native'], fused_add_rms_norm=['native'], gelu_and_mul_sparse=['triton', 'native'])
+(APIServer pid=21537) INFO 10-10 11:00:36 [compilation.py:336] Enabled custom fusions: norm_quant, act_quant
+(EngineCore pid=21736) INFO 10-10 11:00:52 [core.py:123] Initializing a V1 LLM engine (v0.30.0) with config: model='Qwen/Qwen3-8B-FP8', speculative_config=None, tokenizer='Qwen/Qwen3-8B-FP8', skip_tokenizer_init=False, tokenizer_mode=auto, revision=main, tokenizer_revision=main, trust_remote_code=True, dtype=torch.bfloat16, max_seq_len=8192, download_dir=None, load_format=auto, tensor_parallel_size=1, pipeline_parallel_size=1, data_parallel_size=1, decode_context_parallel_size=1, dcp_comm_backend=ag_rs, disable_custom_all_reduce=False, quantization=fp8, quantization_config=None, enforce_eager=False, enable_return_routed_experts=False, kv_cache_dtype=auto, device_config=cuda, structured_outputs_config=StructuredOutputsConfig(backend='auto', disable_any_whitespace=False, disable_additional_properties=False, reasoning_parser='', reasoning_parser_plugin='', enable_in_reasoning=False), observability_config=ObservabilityConfig(show_hidden_metrics_for_version=None, otlp_traces_endpoint=None, collect_detailed_traces=None, per_request_spec_decode_metrics='none', kv_cache_metrics=False, kv_cache_metrics_sample=0.01, cudagraph_metrics=False, enable_layerwise_nvtx_tracing=False, enable_mfu_metrics=False, enable_mm_processor_stats=False, enable_logging_iteration_details=False, jit_monitor_mode='warn', jit_monitor_verbose=False), seed=0, served_model_name=Qwen/Qwen3-8B-FP8, enable_prefix_caching=True, enable_chunked_prefill=True, pooler_config=None, compilation_config={'mode': <CompilationMode.VLLM_COMPILE: 3>, 'debug_dump_path': None, 'cache_dir': '', 'compile_cache_save_format': 'binary', 'backend': 'inductor', 'custom_ops': ['+quant_fp8', 'none', '+quant_fp8'], 'ir_enable_torch_wrap': True, 'splitting_ops': ['vllm::unified_attention_with_output', 'vllm::unified_mla_attention_with_output', 'vllm::mamba_mixer2', 'vllm::mamba_mixer', 'vllm::short_conv', 'vllm::qwen4_exp_ple_short_conv', 'vllm::qwen4_exp_qsa_with_output', 'vllm::linear_attention', 'vllm::qwen_gdn_attention_core', 'vllm::qwen_gdn_attention_core_fused_norm_packed', 'vllm::gdn_attention_core_xpu', 'vllm::olmo_hybrid_gdn_full_forward', 'vllm::sparse_attn_indexer', 'vllm::rocm_aiter_sparse_attn_indexer', 'vllm::deepseek_v4_attention', 'vllm::hpc_rope_norm_forward', 'vllm::unified_kv_cache_update', 'vllm::unified_mla_kv_cache_update'], 'compile_mm_encoder': False, 'cudagraph_mm_encoder': False, 'encoder_cudagraph_token_budgets': [], 'encoder_cudagraph_max_vision_items_per_batch': 0, 'encoder_cudagraph_max_frames_per_batch': None, 'compile_sizes': [], 'compile_ranges_endpoints': [2048], 'inductor_compile_config': {'enable_auto_functionalized_v2': False, 'combo_kernels': True, 'benchmark_combo_kernel': True}, 'inductor_passes': {}, 'cudagraph_mode': <CUDAGraphMode.FULL_AND_PIECEWISE: (2, 1)>, 'cudagraph_num_of_warmups': 1, 'cudagraph_capture_sizes': [1, 2, 4, 8, 16, 24, 32, 40, 48, 56, 64, 72, 80, 88, 96, 104, 112, 120, 128, 136, 144, 152, 160, 168, 176, 184, 192, 200, 208, 216, 224, 232, 240, 248, 256, 272, 288, 304, 320, 336, 352, 368, 384, 400, 416, 432, 448, 464, 480, 496, 512], 'cudagraph_copy_inputs': False, 'cudagraph_specialize_lora': True, 'use_inductor_graph_partition': False, 'pass_config': {'fuse_norm_quant': True, 'fuse_act_quant': True, 'fuse_attn_quant': False, 'enable_sp': False, 'fuse_gemm_comms': False, 'fuse_allreduce_rms': False, 'enable_qk_norm_rope_fusion': False, 'fuse_rope_kvcache_cat_mla': False, 'fuse_act_padding': False, 'fuse_qk_norm_rope_kvcache': False}, 'max_cudagraph_capture_size': 512, 'dynamic_shapes_config': {'type': <DynamicShapesType.BACKED: 'backed'>, 'evaluate_guards': False, 'assume_32_bit_indexing': False}, 'local_cache_dir': None, 'fast_moe_cold_start': False, 'static_all_moe_layers': []}, kernel_config=KernelConfig(ir_op_priority=IrOpPriorityConfig(rms_norm=['native'], fused_add_rms_norm=['native'], gelu_and_mul_sparse=['triton', 'native']), enable_flashinfer_autotune=True, enable_cutedsl_warmup=True, enable_jit_warmup=True, moe_backend='auto', sparse_indexer_topk_backend='auto', linear_backend='auto', linear_backend_per_quant=None)
+(EngineCore pid=21736) INFO 10-10 11:00:53 [parallel_state.py:1827] world_size=1 rank=0 local_rank=0 distributed_init_method=file:///tmp/vllm_dist_f85bdff32ead452a8f54b7b535611d1b backend=nccl
+(EngineCore pid=21736) INFO 10-10 11:00:53 [parallel_state.py:2267] rank 0 in world size 1 is assigned as DP rank 0, PP rank 0, PCP rank 0, TP rank 0, ETP rank 0, EP rank N/A, EPLB rank N/A
+(EngineCore pid=21736) INFO 10-10 11:00:53 [gpu_worker.py:441] Using V2 Model Runner
+(EngineCore pid=21736) INFO 10-10 11:00:54 [model_runner.py:396] Loading model from scratch...
+(EngineCore pid=21736) INFO 10-10 11:00:54 [__init__.py:726] Selected MarlinFP8ScaledMMLinearKernel for Fp8LinearMethod
+(EngineCore pid=21736) INFO 10-10 11:00:55 [cuda.py:538] Using FLASH_ATTN attention backend out of potential backends: ['FLASH_ATTN', 'FLASHINFER', 'TRITON_ATTN', 'FLEX_ATTENTION'].
+(EngineCore pid=21736) INFO 10-10 11:00:55 [flash_attn.py:1116] Using FlashAttention version 2
+(EngineCore pid=21736) INFO 10-10 11:00:56 [weight_utils.py:895] Filesystem type for checkpoints: LIGHTNING. Checkpoint size: 8.79 GiB. Available RAM: 10.55 GiB.
+(EngineCore pid=21736) INFO 10-10 11:00:56 [weight_utils.py:918] Auto-prefetch is disabled because the filesystem (LIGHTNING) is not a recognized network FS (NFS/Lustre). If you want to force prefetching, start vLLM with --safetensors-load-strategy=prefetch.
+(EngineCore pid=21736) Loading safetensors checkpoint shards:   0% Completed | 0/2 [00:00<?, ?it/s]
+(EngineCore pid=21736) Loading safetensors checkpoint shards:  50% Completed | 1/2 [00:01<00:01,  1.48s/it]
+(EngineCore pid=21736) Loading safetensors checkpoint shards: 100% Completed | 2/2 [00:02<00:00,  1.48s/it]
+(EngineCore pid=21736) Loading safetensors checkpoint shards: 100% Completed | 2/2 [00:02<00:00,  1.48s/it]
+(EngineCore pid=21736) 
+(EngineCore pid=21736) INFO 10-10 11:00:59 [default_loader.py:430] Loading weights took 3.08 seconds
+(EngineCore pid=21736) WARNING 10-10 11:00:59 [marlin_utils_fp8.py:110] Your GPU does not have native support for FP8 computation but FP8 quantization is being used. Weight-only FP8 compression will be used leveraging the Marlin kernel. This may degrade performance for compute-heavy workloads.
+(EngineCore pid=21736) INFO 10-10 11:01:00 [model_runner.py:428] Model loading took 8.9 GiB memory and 6.715324 seconds
+(EngineCore pid=21736) INFO 10-10 11:01:00 [topk_topp_sampler.py:78] Using FlashInfer for top-p & top-k sampling.
+(EngineCore pid=21736) INFO 10-10 11:01:00 [utils.py:320] Using LBNHC KV cache layout.
+(APIServer pid=21537) INFO 10-10 11:01:02 [utils.py:632] [shutdown] Process manager: send sigterm to process EngineCore
+(APIServer pid=21537) Traceback (most recent call last):
+(APIServer pid=21537)   File "/home/zeus/miniconda3/envs/cloudspace/bin/vllm", line 10, in <module>
+(APIServer pid=21537)     sys.exit(main())
+(APIServer pid=21537)              ~~~~^^
+(APIServer pid=21537)   File "/home/zeus/miniconda3/envs/cloudspace/lib/python3.14/site-packages/vllm/entrypoints/cli/main.py", line 106, in main
+(APIServer pid=21537)     args.dispatch_function(args)
+(APIServer pid=21537)     ~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+(APIServer pid=21537)   File "/home/zeus/miniconda3/envs/cloudspace/lib/python3.14/site-packages/vllm/entrypoints/cli/serve.py", line 154, in cmd
+(APIServer pid=21537)     uvloop.run(run_server(args))
+(APIServer pid=21537)     ~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+(APIServer pid=21537)   File "/home/zeus/miniconda3/envs/cloudspace/lib/python3.14/site-packages/uvloop/__init__.py", line 96, in run
+(APIServer pid=21537)     return __asyncio.run(
+(APIServer pid=21537)            ~~~~~~~~~~~~~^
+(APIServer pid=21537)         wrapper(),
+(APIServer pid=21537)         ^^^^^^^^^^
+(APIServer pid=21537)     ...<2 lines>...
+(APIServer pid=21537)         **run_kwargs
+(APIServer pid=21537)         ^^^^^^^^^^^^
+(APIServer pid=21537)     )
+(APIServer pid=21537)     ^
+(APIServer pid=21537)   File "/home/zeus/miniconda3/envs/cloudspace/lib/python3.14/asyncio/runners.py", line 205, in run
+(APIServer pid=21537)     return runner.run(main)
+(APIServer pid=21537)            ~~~~~~~~~~^^^^^^
+(APIServer pid=21537)   File "/home/zeus/miniconda3/envs/cloudspace/lib/python3.14/asyncio/runners.py", line 128, in run
+(APIServer pid=21537)     return self._loop.run_until_complete(task)
+(APIServer pid=21537)            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+(APIServer pid=21537)   File "uvloop/loop.pyx", line 1518, in uvloop.loop.Loop.run_until_complete
+(APIServer pid=21537)   File "/home/zeus/miniconda3/envs/cloudspace/lib/python3.14/site-packages/uvloop/__init__.py", line 48, in wrapper
+(APIServer pid=21537)     return await main
+(APIServer pid=21537)            ^^^^^^^^^^
+(APIServer pid=21537)   File "/home/zeus/miniconda3/envs/cloudspace/lib/python3.14/site-packages/vllm/entrypoints/launchers/api_server/entry.py", line 176, in run_server
+(APIServer pid=21537)     await run_server_worker(listen_address, sock, args, **uvicorn_kwargs)
+(APIServer pid=21537)   File "/home/zeus/miniconda3/envs/cloudspace/lib/python3.14/site-packages/vllm/entrypoints/launchers/api_server/entry.py", line 190, in run_server_worker
+(APIServer pid=21537)     async with build_async_engine_client(
+(APIServer pid=21537)                ~~~~~~~~~~~~~~~~~~~~~~~~~^
+(APIServer pid=21537)         args,
+(APIServer pid=21537)         ^^^^^
+(APIServer pid=21537)         client_config=client_config,
+(APIServer pid=21537)         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+(APIServer pid=21537)     ) as engine_client:
+(APIServer pid=21537)     ^
+(APIServer pid=21537)   File "/home/zeus/miniconda3/envs/cloudspace/lib/python3.14/contextlib.py", line 214, in __aenter__
+(APIServer pid=21537)     return await anext(self.gen)
+(APIServer pid=21537)            ^^^^^^^^^^^^^^^^^^^^^
+(APIServer pid=21537)   File "/home/zeus/miniconda3/envs/cloudspace/lib/python3.14/site-packages/vllm/entrypoints/launchers/api_server/entry.py", line 58, in build_async_engine_client
+(APIServer pid=21537)     async with build_async_engine_client_from_engine_args(
+(APIServer pid=21537)                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+(APIServer pid=21537)         engine_args,
+(APIServer pid=21537)         ^^^^^^^^^^^^
+(APIServer pid=21537)         usage_context=usage_context,
+(APIServer pid=21537)         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+(APIServer pid=21537)         client_config=client_config,
+(APIServer pid=21537)         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+(APIServer pid=21537)     ) as engine:
+(APIServer pid=21537)     ^
+(APIServer pid=21537)   File "/home/zeus/miniconda3/envs/cloudspace/lib/python3.14/contextlib.py", line 214, in __aenter__
+(APIServer pid=21537)     return await anext(self.gen)
+(APIServer pid=21537)            ^^^^^^^^^^^^^^^^^^^^^
+(APIServer pid=21537)   File "/home/zeus/miniconda3/envs/cloudspace/lib/python3.14/site-packages/vllm/entrypoints/launchers/api_server/entry.py", line 94, in build_async_engine_client_from_engine_args
+(APIServer pid=21537)     async_llm = AsyncLLM.from_vllm_config(
+(APIServer pid=21537)         vllm_config=vllm_config,
+(APIServer pid=21537)     ...<6 lines>...
+(APIServer pid=21537)         client_index=client_index,
+(APIServer pid=21537)     )
+(APIServer pid=21537)   File "/home/zeus/miniconda3/envs/cloudspace/lib/python3.14/site-packages/vllm/v1/engine/async_llm.py", line 235, in from_vllm_config
+(APIServer pid=21537)     return cls(
+(APIServer pid=21537)         vllm_config=vllm_config,
+(APIServer pid=21537)     ...<9 lines>...
+(APIServer pid=21537)         client_index=client_index,
+(APIServer pid=21537)     )
+(APIServer pid=21537)   File "/home/zeus/miniconda3/envs/cloudspace/lib/python3.14/site-packages/vllm/v1/engine/async_llm.py", line 169, in __init__
+(APIServer pid=21537)     self.engine_core = EngineCoreClient.make_async_mp_client(
+(APIServer pid=21537)                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+(APIServer pid=21537)         vllm_config=vllm_config,
+(APIServer pid=21537)         ^^^^^^^^^^^^^^^^^^^^^^^^
+(APIServer pid=21537)     ...<5 lines>...
+(APIServer pid=21537)         renderer=renderer,
+(APIServer pid=21537)         ^^^^^^^^^^^^^^^^^^
+(APIServer pid=21537)     )
+(APIServer pid=21537)     ^
+(APIServer pid=21537)   File "/home/zeus/miniconda3/envs/cloudspace/lib/python3.14/site-packages/vllm/tracing/otel.py", line 178, in sync_wrapper
+(APIServer pid=21537)     return func(*args, **kwargs)
+(APIServer pid=21537)   File "/home/zeus/miniconda3/envs/cloudspace/lib/python3.14/site-packages/vllm/v1/engine/core_client.py", line 163, in make_async_mp_client
+(APIServer pid=21537)     return AsyncMPClient(
+(APIServer pid=21537)         *client_args,
+(APIServer pid=21537)         renderer=renderer,
+(APIServer pid=21537)     )
+(APIServer pid=21537)   File "/home/zeus/miniconda3/envs/cloudspace/lib/python3.14/site-packages/vllm/tracing/otel.py", line 178, in sync_wrapper
+(APIServer pid=21537)     return func(*args, **kwargs)
+(APIServer pid=21537)   File "/home/zeus/miniconda3/envs/cloudspace/lib/python3.14/site-packages/vllm/v1/engine/core_client.py", line 1060, in __init__
+(APIServer pid=21537)     super().__init__(
+(APIServer pid=21537)     ~~~~~~~~~~~~~~~~^
+(APIServer pid=21537)         asyncio_mode=True,
+(APIServer pid=21537)         ^^^^^^^^^^^^^^^^^^
+(APIServer pid=21537)     ...<4 lines>...
+(APIServer pid=21537)         renderer=renderer,
+(APIServer pid=21537)         ^^^^^^^^^^^^^^^^^^
+(APIServer pid=21537)     )
+(APIServer pid=21537)     ^
+(APIServer pid=21537)   File "/home/zeus/miniconda3/envs/cloudspace/lib/python3.14/site-packages/vllm/v1/engine/core_client.py", line 656, in __init__
+(APIServer pid=21537)     with launch_core_engines(
+(APIServer pid=21537)          ~~~~~~~~~~~~~~~~~~~^
+(APIServer pid=21537)         vllm_config, executor_class, log_stats, addresses
+(APIServer pid=21537)         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+(APIServer pid=21537)     ) as engine_launch:
+(APIServer pid=21537)     ^
+(APIServer pid=21537)   File "/home/zeus/miniconda3/envs/cloudspace/lib/python3.14/contextlib.py", line 148, in __exit__
+(APIServer pid=21537)     next(self.gen)
+(APIServer pid=21537)     ~~~~^^^^^^^^^^
+(APIServer pid=21537)   File "/home/zeus/miniconda3/envs/cloudspace/lib/python3.14/site-packages/vllm/v1/engine/utils.py", line 1240, in launch_core_engines
+(APIServer pid=21537)     wait_for_engine_startup(
+(APIServer pid=21537)     ~~~~~~~~~~~~~~~~~~~~~~~^
+(APIServer pid=21537)         handshake_socket,
+(APIServer pid=21537)         ^^^^^^^^^^^^^^^^^
+(APIServer pid=21537)     ...<4 lines>...
+(APIServer pid=21537)         launch,
+(APIServer pid=21537)         ^^^^^^^
+(APIServer pid=21537)     )
+(APIServer pid=21537)     ^
+(APIServer pid=21537)   File "/home/zeus/miniconda3/envs/cloudspace/lib/python3.14/site-packages/vllm/v1/engine/utils.py", line 1320, in wait_for_engine_startup
+(APIServer pid=21537)     raise RuntimeError(
+(APIServer pid=21537)     ...<8 lines>...
+(APIServer pid=21537)     )
+(APIServer pid=21537) RuntimeError: Engine core initialization failed. See root cause above. Failed core proc(s): {}
+/home/zeus/miniconda3/envs/cloudspace/lib/python3.14/multiprocessing/resource_tracker.py:475: UserWarning: resource_tracker: There appear to be 1 leaked semaphore objects to clean up at shutdown: {'/loky-21736-zc006uy3'}
+  warnings.warn(
